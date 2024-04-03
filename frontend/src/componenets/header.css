@@ -1,0 +1,25 @@
+.Navbar{
+    padding-top: 5px;
+    width: 100%;
+
+}
+.Logo{
+    height: 5rem;
+    width: 5rem;
+}
+
+.write{
+    background-color: lightgreen;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid white;
+    &:hover{
+        color:teal;
+        background-color: white;
+        border: 1px solid teal;
+    }
+}

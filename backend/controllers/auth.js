@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 
+
 export const register = (req, res) => {
   // Check if user exists
   const q = "SELECT * FROM USERS WHERE username=? OR email=?";
@@ -32,6 +33,7 @@ export const register = (req, res) => {
 export const login = (req, res) => {
   //CHECK USER
   const q = "SELECT * FROM USERS WHERE username=? ";
+  console.log(q);
   db.query(q,[req.body.username],(err,data)=>{
     if(err){
         return res.status(500).json({error:"Internal server error"});
@@ -43,10 +45,15 @@ export const login = (req, res) => {
     if(!isuser) return res.status(400).json("Wrong username or password");
     const {password, ...other}=data[0];
     const token=jwt.sign({id:data[0].id},"jwtkey");
-    res.cookie("access_token",token, {httpOnly:true},).status(200).json(other);
+    res.cookie('access_token', token,{ httpOnly: true }).status(200).json(other);
+    
   })
 };
 
 export const logout=(req,res)=>{
+    res.clearCookie("access_token",{
+        sameSite:"none",
+        secure:true
+      }).status(200).json("User has been logged out.");
 
 };

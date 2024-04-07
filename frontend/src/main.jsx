@@ -14,6 +14,7 @@ import Single from './pages/Single.jsx';
 import Write from './pages/Write.jsx';
 import Header from './componenets/Header.jsx';
 import Footer from './componenets/Footer.jsx';
+import { AuthContextProvider } from './context/authContext.jsx';
 
 const Layout = () =>{
   return (
@@ -31,11 +32,11 @@ const router = createBrowserRouter([
     element: <Layout/>,
     children: [
       {
-        path:"/home",
+        path:"/",
         element:<Home/>
       },
       {
-        path:"/single",
+        path:"/post/:id",
         element: <Single/>,
       },
       {
@@ -58,7 +59,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+    <AuthContextProvider>
     <RouterProvider router={router} />
+    </AuthContextProvider>
+    
   </React.StrictMode>
 );
 

@@ -23,3 +23,14 @@
         border: 1px solid teal;
     }
 }
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #6EE7B7; /* Teal-300 */
+    padding: 1rem; /* Equivalent to p-4 */
+    display: flex;
+    justify-content: space-between; /* Equivalent to justify-between */
+    align-items: center; /* Equivalent to items-center */
+  }
+  

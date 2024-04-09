@@ -7,6 +7,9 @@
     height: 5rem;
     width: 5rem;
 }
+.logout{
+    cursor: pointer;
+}
 
 .write{
     background-color: lightgreen;

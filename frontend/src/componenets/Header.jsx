@@ -23,9 +23,10 @@ function Header() {
                     <Link  className="flex mx-6" to="/?cat=design">DESIGN</Link>
                     <Link  className="flex mx-6" to="/?cat=food">FOOD</Link>
                     <span  className="flex mx-6">{currentuser?.username}</span>
-                    {currentuser? <span  className="flex mx-6 text-blue-500" onClick={logout}>Logout</span> : <Link to="/login" className='text-blue-500 mx-6'>Login</Link>}
+                    {currentuser? <span  className="flex mx-6 text-blue-500 logout" onClick={logout}>Logout</span> : <Link to="/login" className='text-blue-500 mx-6'>Login</Link>}
                     <span  className="flex mx-6 write">
-                        <Link to="/write">Write</Link>
+                        {currentuser? <Link to="/write">Write</Link> : <Link to="/login">Write</Link> }
+                        
                     </span>
                 </div>
             </div>

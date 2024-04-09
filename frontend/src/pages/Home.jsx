@@ -20,10 +20,15 @@ function Home() {
   }, [cat]);
 
   
-  const getText = (html) =>{
-    const doc = new DOMParser().parseFromString(html, "text/html")
-    return doc.body.textContent
-  }
+  const getText = (html, maxLength) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    let text = doc.body.textContent;
+    if (text.length > maxLength) {
+      text = text.substring(0, maxLength) + "..."; // Truncate text if it exceeds maxLength
+    }
+    return text;
+  };
+  
 
     return (
         <div className="home ">
@@ -32,11 +37,12 @@ function Home() {
            
           <div className="post" key={post.id}>
             <div className="img">
-              <img src={post.img} alt="" />
+              <img src={`../upload/${post.img}`} alt="" />
             </div>
             <div className="content">
             <h1>{post.title}</h1>
-            <p>{getText(post.description)}</p>
+            <p>{getText(post.description, 100)}</p>
+
               <Link className="link" to={`/post/${post.id}`}>
               <button>Read More</button>
               </Link>

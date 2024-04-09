@@ -25,6 +25,7 @@
         .img {
           flex: 2;
           position: relative;
+          margin: 20px;
           
           img {
             width: 100%;

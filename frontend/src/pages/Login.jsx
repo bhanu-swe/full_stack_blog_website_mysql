@@ -24,7 +24,7 @@ function Login() {
         e.preventDefault()
         try{
         await login(Inputs);
-        //await axios.post("http://localhost:8800/api/auth/login",Inputs);
+        
         navigate("/")
         }catch(err){
             seterr(err.response.data);

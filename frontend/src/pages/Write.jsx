@@ -1,72 +1,196 @@
-import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import React, { useState, useEffect } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import moment from "moment";
+import "./write.css"
 
-function Write() {
-    const [value, setValue] = useState('');
 
-    return (
-        <div className="mx-2 min-h-screen">
-            <div className="max-w-screen-lg mx-auto flex justify-between">
-                <div className="w-2/3">
-                    <input type="text" placeholder="Title" className="w-full max-w-full mb-5 border border-solid border-lightgreen border-2 px-4 py-2" />
-                    <div className="editcontainer h-80 overflow-y-scroll border border-solid border-lightgreen border-2">
-                        <ReactQuill theme="snow" value={value} onChange={setValue} style={{ height: 'calc(100% - 40px)' }} />
-                    </div>
-                </div>
-                <div  className="w-1/3 ml-5 flex-2 flex-col justify-between ">
-                    <div  className="flex-1 flex-col justify-between border border-solid border-lightgreen border-2 mb-5">
-                        <div className="flex-col mt-1 md-1">
-                            <h1 >Publish</h1>
-                        </div>
-                        <div className="flex-col mt-1 mb-1">
-                            <span><b>Status:</b> draft</span>
-                        </div>
-                        <div className="flex-col mt-1 mb-1">
-                            <span><b>Visibility:</b> draft</span>
-                        </div>
-                        <div className="flex-col mt-1 mb-1">
-                            <input style={{ display: 'none' }} type="file" id="file" name="" />
-                            <label  className='underline cursor-pointer' htmlFor="file">Upload file</label>
-                        </div>
-                        <div className="flex-col mt-1 mb-1">
-                            <div className="flex justify-between">
-                                <button className='cursor-pointer border border-teal-500 text-teal-500 px-3 py-1 rounded'>Save as Draft</button>
-                                <button className='cursor-pointer border border-teal-500 text-white bg-teal-500 px-3 py-1 rounded'>Update</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className='flex-1 flex-col justify-between border border-solid border-lightgreen border-2 mb-5'>
-                        <h2>Category</h2>
-                        <div className="flex items-center  gap-2 text-teal-500">
-                             <input type="radio" name="cat" value="art" id="art" checked />
-                            <label htmlFor="art">Art</label>
-                        </div>
-                        <div className="flex items-center gap-2 text-teal-500">
-                             <input type="radio" name="cat" value="science" id="science" />
-                             <label htmlFor="science">Science</label>
-                        </div>
-                         <div className="flex items-center gap-2 text-teal-500">
-                            <input type="radio" name="cat" value="technology" id="technology" />
-                            <label htmlFor="technology">Technology</label>
-                        </div>
-                        <div className="flex items-center gap-2 text-teal-500">
-                             <input type="radio" name="cat" value="cinema" id="cinema" />
-                            <label htmlFor="cinema">Cinema</label>
-                         </div>
-                         <div className="flex items-center gap-2 text-teal-500">
-                            <input type="radio" name="cat" value="design" id="design" />
-                            <label htmlFor="design">Design</label>
-                        </div>
-                        <div className="flex items-center gap-2 text-teal-500">
-                            <input type="radio" name="cat" value="food" id="food" />
-                            <label htmlFor="food">Food</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
+const Write = () => {
+    const [post, setPost] = useState(null); 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const editValue = searchParams.get("edit");
+  const state =editValue;
+
+  // Now editValue contains the value "6" from the URL query parameter
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const res = await axios.get(`/api/posts/${state}`); 
+            setPost(res.data);
+            settitle(res.data.title || "");
+            setdesc(res.data.description || "");
+            setprev(res.data.img || "");
+            setCat(res.data.category || "");
+        } catch (err) {
+            console.log(err);
+        }
+    };
+    fetchData();
+}, [state]);
+ 
+ 
+  const [title, settitle] = useState( "");
+  const [desc, setdesc] = useState( "");
+  const [file, setFile] = useState( "");
+  const [cat, setCat] = useState( "");
+  const [prev,setprev]=useState("");
+
+  const navigate = useNavigate()
+
+  const upload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await axios.post("/api/upload", formData);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    const imgUrl = await upload();
+    console.log(state);
+    try {
+      post
+        ? await axios.put(`/api/posts/${post.id}`, {
+            title,
+            desc,
+            cat,
+            img: file ? imgUrl : prev,
+          })
+        : await axios.post("/api/posts/", {
+            title,
+            desc,
+            cat,
+            img: file ? imgUrl : "",
+            date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+          });
+          navigate("/")
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return (
+    <div className="add">
+      <div className="content">
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => settitle(e.target.value)}
+        />
+        <div className="editorContainer">
+          <ReactQuill
+            className="editor"
+            theme="snow"
+            value={desc}
+            onChange={setdesc}
+          />
         </div>
-    );
-}
+      </div>
+      <div className="menu">
+        <div className="item">
+          <h1>Publish</h1>
+          <span>
+            <b>Status: </b> Draft
+          </span>
+          <span>
+            <b>Visibility: </b> Public
+          </span>
+          <input
+            style={{ display: "none" }}
+            type="file"
+            id="file"
+            name=""
+           
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+          <label className="file" htmlFor="file">
+            Upload Image
+          </label>
+          <div className="buttons">
+            <button>Save as a draft</button>
+            <button onClick={handleClick}>Publish</button>
+          </div>
+        </div>
+        <div className="item">
+          <h1>Category</h1>
+          <div className="cat">
+            <input
+              type="radio"
+              checked={cat === "art"}
+              name="cat"
+              value="art"
+              id="art"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="art">Art</label>
+          </div>
+          <div className="cat">
+            <input
+              type="radio"
+              checked={cat === "science"}
+              name="cat"
+              value="science"
+              id="science"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="science">Science</label>
+          </div>
+          <div className="cat">
+            <input
+              type="radio"
+              checked={cat === "technology"}
+              name="cat"
+              value="technology"
+              id="technology"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="technology">Technology</label>
+          </div>
+          <div className="cat">
+            <input
+              type="radio"
+              checked={cat === "cinema"}
+              name="cat"
+              value="cinema"
+              id="cinema"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="cinema">Cinema</label>
+          </div>
+          <div className="cat">
+            <input
+              type="radio"
+              checked={cat === "design"}
+              name="cat"
+              value="design"
+              id="design"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="design">Design</label>
+          </div>
+          <div className="cat">
+            <input
+              type="radio"
+              checked={cat === "food"}
+              name="cat"
+              value="food"
+              id="food"
+              onChange={(e) => setCat(e.target.value)}
+            />
+            <label htmlFor="food">Food</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Write;

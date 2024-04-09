@@ -7,6 +7,7 @@ import moment from 'moment';
 import { AuthContext } from '../context/authContext';
 import "./single.css"
 import Menu from "./Menu"
+import DOMPurify from "dompurify";
 
 const Single = () => {
     const [post, setPost] = useState(null); 
@@ -19,7 +20,7 @@ const Single = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get(`http://localhost:8800/api/posts/${pid}`); 
+                const res = await axios.get(`/api/posts/${pid}`); 
                 console.log(res.data);
                 setPost(res.data);
             } catch (err) {
@@ -30,7 +31,7 @@ const Single = () => {
     }, [pid]);
     const hdelete= async()=>{
         try {
-            await axios.delete(`http://localhost:8800/api/posts/${pid}`,{
+            await axios.delete(`/api/posts/${pid}`,{
                 withCredentials: true
               }
         ); 
@@ -45,12 +46,16 @@ const Single = () => {
     if (!post) {
         return null;
     }
+    const getText = (html) =>{
+        const doc = new DOMParser().parseFromString(html, "text/html")
+        return doc.body.textContent
+      }
 
     return (
         <div className="single">
             <div className="content">
                 <div className="innercontent">
-                <img src={post.img} alt=""></img>
+                <img src={`../upload/${post.img}`} alt=""></img>
                 <div className="user">
                 {post.userImg && <img  src={post.userImg} alt=""/> }
                 </div>
@@ -68,7 +73,11 @@ const Single = () => {
                     </div>
                 )}
                 <h1>{post.title}</h1>
-                <p>{post.description}</p>
+                <p
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.description),
+          }}
+        ></p>  
                 </div>
             </div>
             <Menu cat={post.category}/>
